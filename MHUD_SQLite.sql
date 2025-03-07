@@ -1,56 +1,76 @@
-﻿/* Bảng User, có thể không sử dụng
+﻿
+USE master;
+GO
+
+-- Kill all connections to the database if it exists
+IF EXISTS (SELECT name FROM sys.databases WHERE name = 'MHUD')
+BEGIN
+    ALTER DATABASE MHUD SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    
+    DROP DATABASE MHUD;
+END
+GO
+
+CREATE DATABASE MHUD;
+GO
+
+USE MHUD;
+GO
+
+-- Bảng User, có thể không sử dụng
 CREATE TABLE Users (
-    UserID INTEGER PRIMARY KEY,
-    Username TEXT NOT NULL,
-    Password TEXT NOT NULL,
-    Email TEXT NOT NULL,
-    Role TEXT CHECK (Role IN ('Admin', 'User')) NOT NULL
+    UserID INT PRIMARY KEY IDENTITY(1,1),
+    Username NVARCHAR(50) NOT NULL,
+    Password NVARCHAR(100) NOT NULL,
+    Email NVARCHAR(100) NOT NULL,
+    Role NVARCHAR(10) CHECK (Role IN ('Admin', 'User')) NOT NULL
 );
-*/
+
 
 -- Lưu thông tin về các chứng chỉ đã cấp
 CREATE TABLE Certificates (
-    CertificateID INTEGER PRIMARY KEY,
-    CertVersion TEXT NOT NULL,
-    SignatureAlgorithm TEXT NOT NULL,
-    SerialNumber TEXT NOT NULL,
-    IssuerName TEXT NOT NULL,
-    SubjectID INTEGER NOT NULL,
+    CertificateID INT PRIMARY KEY IDENTITY(1,1),
+    CertVersion NVARCHAR(20) NOT NULL,
+    SignatureAlgorithm NVARCHAR(50) NOT NULL,
+    SerialNumber NVARCHAR(100) NOT NULL,
+    IssuerName NVARCHAR(200) NOT NULL,
+    SubjectID INT NOT NULL,
     ValidFrom DATETIME NOT NULL,
     ValidTo DATETIME NOT NULL,
-    PublicKey TEXT NOT NULL,
-    Status TEXT NOT NULL
-    -- FOREIGN KEY (SubjectID) REFERENCES Users(UserID) -- Khóa ngoại nối với bảng Users
+    PublicKey NVARCHAR(MAX) NOT NULL,
+    Status NVARCHAR(20) NOT NULL,
+    FOREIGN KEY (SubjectID) REFERENCES Users(UserID) -- Khóa ngoại nối với bảng Users
 );
 
 -- Quản lý các yêu cầu cấp chứng chỉ
 CREATE TABLE CertificateRequests (
-    RequestID INTEGER PRIMARY KEY,
-    SubjectID INTEGER NOT NULL,
-    PublicKey TEXT NOT NULL,
-    ReqStatus TEXT NOT NULL,
+    RequestID INT PRIMARY KEY IDENTITY(1,1),
+    SubjectID INT NOT NULL,
+    PublicKey NVARCHAR(MAX) NOT NULL,
+    ReqStatus NVARCHAR(20) NOT NULL,
     RequestAt DATETIME NOT NULL,
-    ApprovedAt DATETIME
-    -- FOREIGN KEY (SubjectID) REFERENCES Users(UserID)
+    ApprovedAt DATETIME,
+    FOREIGN KEY (SubjectID) REFERENCES Users(UserID)
 );
 
-/* Bảng chứa certificate đã bị thu hồi, có thể không cần
+-- Bảng chứa certificate đã bị thu hồi, có thể không cần
 CREATE TABLE RevokedCertificates (
-    RevokeID INTEGER PRIMARY KEY,
-    CertificateID INTEGER NOT NULL,
-    Reason TEXT NOT NULL,
+    RevokeID INT PRIMARY KEY IDENTITY(1,1),
+    CertificateID INT NOT NULL,
+    Reason NVARCHAR(200) NOT NULL,
     RevokedTime DATETIME NOT NULL,
     FOREIGN KEY (CertificateID) REFERENCES Certificates(CertificateID)
 );
-*/ 
+ 
 
 -- Ghi lại lịch sử hoạt động
 CREATE TABLE Logs (
-    LogID INTEGER PRIMARY KEY,
-    Action TEXT NOT NULL,
-    DoneBy INTEGER NOT NULL,
-    ObjectID INTEGER NOT NULL,
+    LogID INT PRIMARY KEY IDENTITY(1,1),
+    Action NVARCHAR(100) NOT NULL,
+    DoneBy INT NOT NULL,
+    ObjectID INT NOT NULL,
     Time DATETIME NOT NULL,
-    -- FOREIGN KEY (DoneBy) REFERENCES Users(UserID),
+    FOREIGN KEY (DoneBy) REFERENCES Users(UserID),
     FOREIGN KEY (ObjectID) REFERENCES Certificates(CertificateID)
 );
+GO
