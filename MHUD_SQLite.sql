@@ -34,43 +34,43 @@ CREATE TABLE Certificates (
     SignatureAlgorithm NVARCHAR(50) NOT NULL,
     SerialNumber NVARCHAR(100) NOT NULL,
     IssuerName NVARCHAR(200) NOT NULL,
-    SubjectID INT NOT NULL,
+    UserID INT NOT NULL,
     ValidFrom DATETIME NOT NULL,
     ValidTo DATETIME NOT NULL,
     PublicKey NVARCHAR(MAX) NOT NULL,
     Status NVARCHAR(20) NOT NULL,
-    FOREIGN KEY (SubjectID) REFERENCES Users(UserID) -- Khóa ngoại nối với bảng Users
+    FOREIGN KEY (UserID) REFERENCES Users(UserID) -- Khóa ngoại nối với bảng Users
 );
 
 -- Quản lý các yêu cầu cấp chứng chỉ
 CREATE TABLE CertificateRequests (
     RequestID INT PRIMARY KEY IDENTITY(1,1),
-    SubjectID INT NOT NULL,
+    UserID INT NOT NULL,
     PublicKey NVARCHAR(MAX) NOT NULL,
     ReqStatus NVARCHAR(20) NOT NULL,
     RequestAt DATETIME NOT NULL,
     ApprovedAt DATETIME,
-    FOREIGN KEY (SubjectID) REFERENCES Users(UserID)
+    FOREIGN KEY (UserID) REFERENCES Users(UserID)
 );
 
 -- Bảng chứa certificate đã bị thu hồi, có thể không cần
-CREATE TABLE RevokedCertificates (
-    RevokeID INT PRIMARY KEY IDENTITY(1,1),
-    CertificateID INT NOT NULL,
-    Reason NVARCHAR(200) NOT NULL,
-    RevokedTime DATETIME NOT NULL,
-    FOREIGN KEY (CertificateID) REFERENCES Certificates(CertificateID)
-);
+-- CREATE TABLE RevokedCertificates (
+--     RevokeID INT PRIMARY KEY IDENTITY(1,1),
+--     CertificateID INT NOT NULL,
+--     Reason NVARCHAR(200) NOT NULL,
+--     RevokedTime DATETIME NOT NULL,
+--     FOREIGN KEY (CertificateID) REFERENCES Certificates(CertificateID)
+-- );
  
 
 -- Ghi lại lịch sử hoạt động
 CREATE TABLE Logs (
     LogID INT PRIMARY KEY IDENTITY(1,1),
     Action NVARCHAR(100) NOT NULL,
-    DoneBy INT NOT NULL,
+    UserID INT NOT NULL,
     ObjectID INT NOT NULL,
     Time DATETIME NOT NULL,
-    FOREIGN KEY (DoneBy) REFERENCES Users(UserID),
+    FOREIGN KEY (UserID) REFERENCES Users(UserID),
     FOREIGN KEY (ObjectID) REFERENCES Certificates(CertificateID)
 );
 GO
