@@ -14,5 +14,10 @@ Bước 2: Sử dụng vcpkg để cài đặt OpenSSL
 Hoặc, chạy câu lệnh sau trong CMD/PowerShell:
 git clone https://github.com/microsoft/vcpkg.git && cd vcpkg && .\bootstrap-vcpkg.bat && .\vcpkg integrate install && .\vcpkg install openssl:x64-windows
 
-
-
+Cách Compile và Run ở VSCode
+B1: Compile: 
+    g++ KeyGen.cpp -o generate_p12 -lssl -lcrypto
+B2: ./generate_p12
+B3: Run Program: 
+    openssl pkcs12 -info -in my_key.p12 -nocerts -nodes
+###Chưa thể chạy trên Visual Studio vì cần chạy lệnh của openssl trên terminal (Sẽ Tìm Hiểu Thêm)
