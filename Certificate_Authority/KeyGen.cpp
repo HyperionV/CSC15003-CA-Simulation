@@ -1,28 +1,45 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <cstdio>
+#include <openssl/applink.c>
 #include <iostream>
 #include <openssl/ec.h>
 #include <string>  
 #include <openssl/pkcs12.h>
+#include <openssl/evp.h>
+#include <openssl/pem.h>
 
 using namespace std;
 
 EVP_PKEY* generateECDSAKey() {
-    EC_KEY* ecKey = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
-    if (!ecKey || !EC_KEY_generate_key(ecKey)) { //Sinh một cặp khóa riêng và công khai.
-        std::cerr << "ERROR: Can't create key!\n";
-        if (ecKey) EC_KEY_free(ecKey);
+    EVP_PKEY_CTX* ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_EC, NULL);
+    if (!ctx) {
+        std::cerr << "ERROR: Can't create key context!\n";
         return nullptr;
     }
 
-    // Chuyển đổi EC_KEY sang EVP_PKEY để dùng với OpenSSL
-    EVP_PKEY* pkey = EVP_PKEY_new();
-    if (!EVP_PKEY_assign_EC_KEY(pkey, ecKey)) {
-        std::cerr << "ERROR: Can't paste EC_KEY to EVP_PKEY!\n";
-        EVP_PKEY_free(pkey);
+    if (EVP_PKEY_keygen_init(ctx) <= 0) {
+        std::cerr << "ERROR: Can't initialize keygen!\n";
+        EVP_PKEY_CTX_free(ctx);
         return nullptr;
     }
 
+    if (EVP_PKEY_CTX_set_ec_paramgen_curve_nid(ctx, NID_X9_62_prime256v1) <= 0) {
+        std::cerr << "ERROR: Can't set curve!\n";
+        EVP_PKEY_CTX_free(ctx);
+        return nullptr;
+    }
+
+    EVP_PKEY* pkey = nullptr;
+    if (EVP_PKEY_keygen(ctx, &pkey) <= 0) {
+        std::cerr << "ERROR: Can't generate EC key!\n";
+        EVP_PKEY_CTX_free(ctx);
+        return nullptr;
+    }
+
+    EVP_PKEY_CTX_free(ctx);
     return pkey;
 }
+
 void saveToPKCS12(const string& p12File, const string& password, EVP_PKEY* pkey, X509* cert) {
     PKCS12* p12 = PKCS12_create(password.c_str(), "MyCA", pkey, cert, NULL, 0, 0, 0, 0, 0);
     FILE* file = fopen(p12File.c_str(), "wb");
@@ -31,7 +48,7 @@ void saveToPKCS12(const string& p12File, const string& password, EVP_PKEY* pkey,
     PKCS12_free(p12);
 }
 
-// Hàm tạo chứng chỉ giả (chỉ để thử nghiệm, không có giá trị thực tế)
+// tạo chứng chỉ giả (chỉ để test hàm tạo key)
 X509* generateSelfSignedCert(EVP_PKEY* pkey) {
     X509* cert = X509_new();
     if (!cert) {
@@ -63,24 +80,23 @@ X509* generateSelfSignedCert(EVP_PKEY* pkey) {
 //./generate_p12
 //openssl pkcs12 -info -in my_key.p12 -nocerts -nodes
 
-int main() {
-    string p12File = "my_key.p12";
-    string password = "1";
+// int main() {
+//     string p12File = "my_key.p12";
+//     string password = "1";
 
-    EVP_PKEY* pkey = generateECDSAKey();
-    if (!pkey) return 1;
+//     EVP_PKEY* pkey = generateECDSAKey();
+//     if (!pkey) return 1;
 
-    X509* cert = generateSelfSignedCert(pkey);
-    if (!cert) {
-        EVP_PKEY_free(pkey);
-        return 1;
-    }
+//     X509* cert = generateSelfSignedCert(pkey);
+//     if (!cert) {
+//         EVP_PKEY_free(pkey);
+//         return 1;
+//     }
     
-    saveToPKCS12(p12File, password, pkey, cert);
+//     saveToPKCS12(p12File, password, pkey, cert);
 
-    // Giải phóng bộ nhớ
-    EVP_PKEY_free(pkey);
-    X509_free(cert);
+//     EVP_PKEY_free(pkey);
+//     X509_free(cert);
 
-    return 0;
-}
+//     return 0;
+// }
