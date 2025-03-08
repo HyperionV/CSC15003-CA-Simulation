@@ -11,5 +11,8 @@ Bước 2: Sử dụng vcpkg để cài đặt OpenSSL
 - Chạy lệnh .\vcpkg install openssl:x64-windows để cài đặt OpenSSL
 - OpenSSL sẽ được tự động cài đặt và có thể được include trong Visual Studio
 
+Hoặc, chạy câu lệnh sau trong CMD/PowerShell:
+git clone https://github.com/microsoft/vcpkg.git && cd vcpkg && .\bootstrap-vcpkg.bat && .\vcpkg integrate install && .\vcpkg install openssl:x64-windows
+
 
 
