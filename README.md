@@ -33,7 +33,7 @@ g++ KeyGen.cpp -o generate_p12 -lssl -lcrypto
 openssl pkcs12 -info -in my_key.p12 -nocerts -nodes
 ```
 
-5. Chương Trình sẽ bắt nhập mật khẩu (mặc định là 1), lưu ý khi nhập mật khẩu thì những kí tự nhập vào sẽ không hiện lên terminal
+5. Chương Trình sẽ yêu cầu nhập mật khẩu (mặc định là 1), lưu ý khi nhập mật khẩu thì những kí tự nhập vào sẽ không hiện lên terminal.
 
 ### Lưu ý
 - Hiện chưa thể chạy trên Visual Studio vì cần chạy lệnh của openssl trên terminal (Sẽ tìm hiểu thêm về cách biên dịch và thực thi openssl trên VS)
