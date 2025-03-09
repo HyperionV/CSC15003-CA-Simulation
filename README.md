@@ -1,4 +1,4 @@
-Cách cài đặt OpenSSL trong Visual Studio
+### Hướng dẫn cài đặt OpenSSL trong Visual Studio
 
 Bước 1: Cài đặt vcpkg
 - Vào đường dẫn https://github.com/microsoft/vcpkg.git để tải file zip về và giải nén
@@ -32,4 +32,5 @@ openssl pkcs12 -info -in my_key.p12 -nocerts -nodes
 ```
 B5: Chương Trình sẽ bắt nhập mật khẩu (mặc định là 1), lưu ý khi nhập mật khẩu thì những kí tự nhập vào sẽ không hiện lên terminal
 
-**Lưu ý**: Chưa thể chạy trên Visual Studio vì cần chạy lệnh của openssl trên terminal (Sẽ tìm hiểu thêm về cách biên dịch và thực thi openssl trên VS)
+### Lưu ý
+- Hiện chưa thể chạy trên Visual Studio vì cần chạy lệnh của openssl trên terminal (Sẽ tìm hiểu thêm về cách biên dịch và thực thi openssl trên VS)
