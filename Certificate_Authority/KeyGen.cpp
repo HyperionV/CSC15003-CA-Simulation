@@ -13,25 +13,25 @@ using namespace std;
 EVP_PKEY* generateECDSAKey() {
     EVP_PKEY_CTX* ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_EC, NULL);
     if (!ctx) {
-        std::cerr << "ERROR: Can't create key context!\n";
+        cerr << "ERROR: Can't create key context!\n";
         return nullptr;
     }
 
     if (EVP_PKEY_keygen_init(ctx) <= 0) {
-        std::cerr << "ERROR: Can't initialize keygen!\n";
+        cerr << "ERROR: Can't initialize keygen!\n";
         EVP_PKEY_CTX_free(ctx);
         return nullptr;
     }
 
     if (EVP_PKEY_CTX_set_ec_paramgen_curve_nid(ctx, NID_X9_62_prime256v1) <= 0) {
-        std::cerr << "ERROR: Can't set curve!\n";
+        cerr << "ERROR: Can't set curve!\n";
         EVP_PKEY_CTX_free(ctx);
         return nullptr;
     }
 
     EVP_PKEY* pkey = nullptr;
     if (EVP_PKEY_keygen(ctx, &pkey) <= 0) {
-        std::cerr << "ERROR: Can't generate EC key!\n";
+        cerr << "ERROR: Can't generate EC key!\n";
         EVP_PKEY_CTX_free(ctx);
         return nullptr;
     }
