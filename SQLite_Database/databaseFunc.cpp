@@ -34,11 +34,13 @@ bool deleteCertificate(sqlite3* db, int certificateID) {
 }
 
 // Thêm yêu cầu cấp chứng chỉ vào CertificateRequests
-bool insertCertificateRequest(sqlite3* db, int userID, const string& publicKey, const string& reqStatus, const string& requestAt, const string& approvedAt) {
-    string sql = "INSERT INTO CertificateRequests (UserID, PublicKey, ReqStatus, RequestAt, ApprovedAt) VALUES ("
-                + to_string(userID) + ", '" + publicKey + "', '" + reqStatus + "', '" + requestAt + "', " 
-                + (approvedAt.empty() ? "NULL" : "'" + approvedAt + "'") + ");";
-    return executeQuery(db, sql);
+bool insertCertificateRequest(sqlite3* db, int userID, const string& publicKey, const string& commonName, 
+    const string& organization, const string& country, 
+    const string& reqStatus, const string& requestAt, const string& approvedAt) {
+string sql = "INSERT INTO CertificateRequests (UserID, PublicKey, CommonName, Organization, Country, ReqStatus, RequestAt, ApprovedAt) VALUES ("
++ to_string(userID) + ", '" + publicKey + "', '" + commonName + "', '" + organization + "', '" + country + "', '" 
++ reqStatus + "', '" + requestAt + "', " + (approvedAt.empty() ? "NULL" : "'" + approvedAt + "'") + ");";
+return executeQuery(db, sql);
 }
 
 // Xóa yêu cầu cấp chứng chỉ theo RequestID
@@ -102,12 +104,6 @@ int main() {
 
     // Ví dụ: Xóa chứng chỉ có ID = 1
     deleteCertificate(db, 1);
-
-    // Ví dụ: Thêm yêu cầu cấp chứng chỉ
-    insertCertificateRequest(db, 1, "PUBLIC_KEY_REQUEST", "Pending", "2025-03-19", "");
-
-    // Ví dụ: Xóa yêu cầu có ID = 1
-    deleteCertificateRequest(db, 1);
 
     // Ví dụ: Thêm chứng chỉ bị thu hồi
     insertRevokedCertificate(db, 1, "Compromised", "2025-03-19");
