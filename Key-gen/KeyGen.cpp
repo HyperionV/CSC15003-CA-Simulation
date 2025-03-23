@@ -1,5 +1,6 @@
 #include "KeyGen.h"
 
+// Tạo private keykey
 EVP_PKEY* generateECDSAKey() {
     EVP_PKEY_CTX* ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_EC, NULL);
     if (!ctx) {
@@ -30,6 +31,7 @@ EVP_PKEY* generateECDSAKey() {
     return pkey;
 }
 
+// Save Key đến PKS12 
 void saveToPKCS12(const string& p12File, const string& password, EVP_PKEY* pkey, X509* cert) {
     PKCS12* p12 = PKCS12_create(password.c_str(), "MyCA", pkey, cert, NULL, 0, 0, 0, 0, 0);
     FILE* file = fopen(p12File.c_str(), "wb");
@@ -66,76 +68,28 @@ X509* generateSelfSignedCert(EVP_PKEY* pkey) {
     return cert;
 }
 
+
 // g++ KeyGen.cpp -o generate_p12 -lssl -lcrypto
 //./generate_p12
 //openssl pkcs12 -info -in my_key.p12 -nocerts -nodes
 
-int main() {
-    string p12File = "my_key.p12";
-    string password = "1";
+// int main() {
+//     string p12File = "my_key.p12";
+//     string password = "1";
 
-    EVP_PKEY* pkey = generateECDSAKey();
-    if (!pkey) return 1;
+//     EVP_PKEY* pkey = generateECDSAKey();
+//     if (!pkey) return 1;
 
-    X509* cert = generateSelfSignedCert(pkey);
-    if (!cert) {
-        EVP_PKEY_free(pkey);
-        return 1;
-    }
+//     X509* cert = generateSelfSignedCert(pkey);
+//     if (!cert) {
+//         EVP_PKEY_free(pkey);
+//         return 1;
+//     }
+    
+//     saveToPKCS12(p12File, password, pkey, cert);
 
-    saveToPKCS12(p12File, password, pkey, cert);
+//     EVP_PKEY_free(pkey);
+//     X509_free(cert);
 
-    // Đọc lại file PKCS#12 và in nội dung ra console
-    FILE* file = fopen(p12File.c_str(), "rb");
-    if (!file) {
-        cerr << "ERROR: Unable to open " << p12File << "\n";
-        EVP_PKEY_free(pkey);
-        X509_free(cert);
-        return 1;
-    }
-
-    PKCS12* p12 = d2i_PKCS12_fp(file, NULL);
-    fclose(file);
-
-    if (!p12) {
-        cerr << "ERROR: Unable to read PKCS#12 file\n";
-        EVP_PKEY_free(pkey);
-        X509_free(cert);
-        return 1;
-    }
-
-    EVP_PKEY* out_pkey = NULL;
-    X509* out_cert = NULL;
-    STACK_OF(X509)* ca = NULL;
-
-    // Nhập lại mật khẩu để giải mã
-    string decryptPassword;
-    cout << "Enter password to decrypt PKCS#12 file: ";
-    cin >> decryptPassword;
-
-    if (!PKCS12_parse(p12, decryptPassword.c_str(), &out_pkey, &out_cert, &ca)) {
-        cerr << "ERROR: Invalid password or corrupted file\n";
-        PKCS12_free(p12);
-        EVP_PKEY_free(pkey);
-        X509_free(cert);
-        return 1;
-    }
-
-
-    PKCS12_free(p12);
-
-    cout << "PKCS#12 file loaded successfully!\n";
-    cout << "Private Key:\n";
-    PEM_write_PrivateKey(stdout, out_pkey, NULL, NULL, 0, NULL, NULL);
-
-    cout << "Certificate:\n";
-    PEM_write_X509(stdout, out_cert);
-
-    EVP_PKEY_free(out_pkey);
-    X509_free(out_cert);
-    sk_X509_pop_free(ca, X509_free);
-    EVP_PKEY_free(pkey);
-    X509_free(cert);
-
-    return 0;
-}
+//     return 0;
+// }

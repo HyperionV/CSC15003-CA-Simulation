@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "cstdio": "cpp",
+    "string": "cpp",
+    "applink.c": "cpp",
+    "iostream": "cpp",
+    "xstring": "cpp",
+    "vector": "cpp"
+  }
+}

@@ -1,50 +1,57 @@
-#pragma once
-
+#include <openssl/evp.h>
+#include <openssl/x509.h>
+#include <openssl/x509v3.h>
+#include <openssl/pem.h>
+#include "sqlite3.h"
+#include <iostream>
 #include <string>
 #include <vector>
+#include <memory>
+#include <openssl/bio.h>
+#include <ctime>
+#include <sstream>
+#include "D:\CSC15003-CA-Simulation\SQLite_Database\databaseFunc.cpp"
+#include <D:\CSC15003-CA-Simulation\Key-gen\KeyGen.cpp>
 
 using namespace std;
 
 class CA {
 private:
-    string commonName;
-    string organizationName;
-    string organizationalUnit;
-    string locality;
-    string state;
-    string country;
-    string emailAddress;
+    // Private key của CA (lưu trong memory)
+    EVP_PKEY* _caPrivateKey;
+
+    // Chứng chỉ của CA (lưu trong memory)
+    X509* _caCertificate;
+
+    // Kết nối đến cơ sở dữ liệu SQLite
+    sqlite3* _db;
+
+    // Thông tin về CA
+    std::string _countryName;
+    std::string _organization;
+    std::string _commonName;
+
+    // Serial number counter (lưu trong database)
+    long _nextSerialNumber;
+
+    // Cấu hình CA
+    int _defaultValidityDays; // Thời hạn hiệu lực mặc định của chứng chỉ
+    int _keySize;             // Kích thước khóa mặc định
 
 public:
-    // Constructor with parameters
-    CA(const string& cn, const string& on, const string& ou,
-       const string& loc, const string& st, const string& cou,
-       const string& email);
-
-    // Constructor for user input
+    // Constructor và Destructor
     CA();
+    ~CA();
 
-    // Getters
-    string getCommonName() const;
-    string getOrganizationName() const;
-    string getOrganizationalUnit() const;
-    string getLocality() const;
-    string getState() const;
-    string getCountry() const;
-    string getEmailAddress() const;
-
-    // Setters
-    void setCommonName(const string& cn);
-    void setOrganizationName(const string& on);
-    void setOrganizationalUnit(const string& ou);
-    void setLocality(const string& loc);
-    void setState(const string& st);
-    void setCountry(const string& cou);
-    void setEmailAddress(const string& email);
-
-    // Method to display CA information
-    void displayInfo() const;
-
-    // Method to generate a certificate (placeholder)
-    void generateCertificate(const string& domain);
+    // Các phương thức
+    bool initializeDatabase(const std::string& dbPath); // Khởi tạo database
+    bool loadCA(const std::string& privateKeyPEM, const std::string& certificatePEM); // Load CA từ PEM
+    bool issueCertificate(const std::string& commonName, const std::string& publicKeyPEM); // Cấp chứng chỉ
+    bool revokeCertificate(const std::string& serialNumber); // Thu hồi chứng chỉ
+    std::string getCertificate(const std::string& serialNumber); // Lấy chứng chỉ từ database
+    // void log(const std::string& message); // Ghi log (có thể lưu vào database)
+    bool createCSR(const std::string& commonName, const std::string& country, const std::string& organization, const std::string& publicKeyPEM,
+        int userID);
+    std::string signCSR(const std::string &csrPEM);
+    bool cancelCertificate(const std::string& serialNumber);
 };
