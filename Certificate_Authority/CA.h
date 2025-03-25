@@ -2,7 +2,7 @@
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
 #include <openssl/pem.h>
-#include "sqlite3.h"
+#include "/CSC15003-CA-Simulation/SQLite_Database/sqlite3.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -10,8 +10,7 @@
 #include <openssl/bio.h>
 #include <ctime>
 #include <sstream>
-#include "D:\CSC15003-CA-Simulation\SQLite_Database\databaseFunc.cpp"
-#include <D:\CSC15003-CA-Simulation\Key-gen\KeyGen.cpp>
+#include "/CSC15003-CA-Simulation/SQLite_Database/databaseFunc.h"
 
 using namespace std;
 

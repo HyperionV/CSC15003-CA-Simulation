@@ -86,7 +86,7 @@ bool CA::issueCertificate(const std::string& commonName, const std::string& publ
     strftime(validFrom, sizeof(validFrom), "%Y-%m-%d", ltm);
 
     // Tính validTo bằng cách cộng thêm _defaultValidityDays
-    now += _defaultValidityDays * 24 * 3600;
+    now += static_cast<long long>(_defaultValidityDays) * 24 * 3600;
     ltm = localtime(&now);
     char validTo[20];
     strftime(validTo, sizeof(validTo), "%Y-%m-%d", ltm);
@@ -94,6 +94,11 @@ bool CA::issueCertificate(const std::string& commonName, const std::string& publ
     std::string status = "Active";
 
     // Gọi hàm insertCertificate từ file database
+    if (!_db) {
+        std::cerr << "Error: DB didn't create!\n";
+        return false;
+    }
+
     bool result = insertCertificate(_db, certVersion, signatureAlgorithm, serialNumber,
                                     issuerName, userID, validFrom, validTo, publicKeyPEM, status);
     if (result) {
@@ -246,7 +251,7 @@ bool CA::createCSR(const std::string& commonName,
 
     // 6. Gửi yêu cầu CSR vào cơ sở dữ liệu
     // Ở đây ta sử dụng hàm insertCertificateRequest có sẵn, với trạng thái "Pending"
-    if (!insertCertificateRequest(_db, userID, csrPEM, "Pending", requestAt, "")) {
+    if (!insertCertificateRequest(_db, userID, csrPEM, "Pending", requestAt, "", "", "", "")) {
     std::cerr << "Lỗi: Không thể ghi CSR vào database" << std::endl;
     return false;
     }
@@ -381,7 +386,7 @@ std::string CA::signCSR(const std::string &csrPEM) {
         return "";
     }
     ASN1_TIME_set(notBefore, now);
-    ASN1_TIME_set(notAfter, now + _defaultValidityDays * 24 * 3600);
+    ASN1_TIME_set(notAfter, now + static_cast<long long>(_defaultValidityDays) * 24 * 3600);
     if (X509_set_notBefore(cert, notBefore) != 1 ||
         X509_set_notAfter(cert, notAfter) != 1) {
         std::cerr << "Lỗi: Không thiết lập thời gian hiệu lực" << std::endl;
@@ -461,3 +466,4 @@ bool CA::cancelCertificate(const std::string &serialNumber) {
     std::cout << "Chứng chỉ với serial number " << serialNumber << " đã được hủy và xóa khỏi database." << std::endl;
     return true;
 }
+

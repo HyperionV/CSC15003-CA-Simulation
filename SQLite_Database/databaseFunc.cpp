@@ -1,14 +1,10 @@
-#include <iostream>
-#include <string>
-#include <sqlite3.h>
-
-using namespace std;
+#include "databaseFunc.h"
 
 // Hàm thực thi SQL (INSERT, DELETE)
 bool executeQuery(sqlite3* db, const string& sql) {
     char* errMsg = nullptr;
     if (sqlite3_exec(db, sql.c_str(), nullptr, 0, &errMsg) != SQLITE_OK) {
-        cerr << "Lỗi SQLite: " << errMsg << endl;
+        cerr << "Error SQLite: " << errMsg << endl;
         sqlite3_free(errMsg);
         return false;
     }
@@ -88,6 +84,7 @@ bool deleteLog(sqlite3* db, int logID) {
 }
 
 // ======================== CHƯƠNG TRÌNH CHÍNH ========================
+/*
 int main() {
     sqlite3* db;
     int rc = sqlite3_open("MHUD.db", &db);
@@ -120,3 +117,4 @@ int main() {
     sqlite3_close(db);
     return 0;
 }
+*/
