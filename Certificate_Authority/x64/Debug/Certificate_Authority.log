@@ -1,8 +1,0 @@
-﻿  CA.cpp
-  KeyGen.cpp
-  main.cpp
-  Generating Code...
-     Creating library D:\CSC15003-CA-Simulation\Certificate_Authority\x64\Debug\Certificate_Authority.lib and object D:\CSC15003-CA-Simulation\Certificate_Authority\x64\Debug\Certificate_Authority.exp
-  Certificate_Authority.vcxproj -> D:\CSC15003-CA-Simulation\Certificate_Authority\x64\Debug\Certificate_Authority.exe
-  'pwsh.exe' is not recognized as an internal or external command,
-  operable program or batch file.
